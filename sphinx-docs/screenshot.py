@@ -30,8 +30,11 @@ class Screenshot(Image):
         else:
             return {'id': split_str[0], 'annotation': split_str[1]}
 
+    # Add options to the image directive.
     option_spec = Image.option_spec.copy()
     option_spec['url'] = directives.unchanged
+    option_spec['user-role'] = directives.unchanged
+    option_spec['navigation-steps'] = directives.unchanged
     option_spec['focus'] = _focus
 
     def run(self):
@@ -54,6 +57,13 @@ class Screenshot(Image):
 
         if 'url' in self.options:
             return_nodes.append(nodes.Text("URL is '%s'.  " % self.options['url']))
+
+        if 'user-role' in self.options:
+            return_nodes.append(nodes.Text("User role is '%s'.  " % self.options['user-role']))
+
+        if 'navigation-steps' in self.options:
+            return_nodes.append(nodes.Text("Navigation steps are '%s'.  " % self.options['navigation-steps']))
+
         if 'focus' in self.options:
             return_nodes.append(nodes.Text("DOM id is '%s' and annotation is '%s'.  " % (self.options['focus']['id'], self.options['focus']['annotation'])))
 
