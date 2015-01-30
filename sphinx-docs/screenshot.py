@@ -6,6 +6,31 @@ import docutils.parsers.rst.directives as directives
 import re
 
 from exceptions import NotImplementedError
+from sphinx.errors import SphinxError
+
+class ActionError(SphinxError):
+    """ Exception raised for unrecognized actions in the input.
+
+    Attributes:
+      action: the action for which the error occured.
+    """
+    def __init__(self, action):
+        self.action = action
+
+    def __str__(self):
+        return "The specified action '%s' is not recognized." % (self.action)
+
+class OptionError(SphinxError):
+    """ Exception raised for unrecognized options for an action in the input.
+
+    Attributes:
+      msg: the message to be thrown for the exception.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
 
 def setup(app):
     app.add_directive('screenshot', Screenshot)
@@ -26,21 +51,27 @@ def _parse_command(command):
     """" Parses a command into action and options.
 
     Returns a dictionary with following keys:
+       selector (string): the selector to identify the element
        action (string): the action type (if it's recognized)
        options (list): a list of options
 
-       Both keys have empty values if action type is not recognized.
+    Raises an error if action type is not recognized or if options are invalid.
     """
-    # Initalize action and opttions with empty values.
-    action = ''
-    options = []
+    # Replace multiple spaces by one.
+    command_args = " ".join(command.split())
+    selector = command_args[0]
+    action = command_args[1]
+    options = command_args[-1]
 
-    command_args = command.split(' ')
-    if command_args[0] in ('click', 'send_keys', 'submit'):
-        action = command_args[0]
-        options = command_args[-1]
+    if action not in ('click', 'send_keys', 'submit'):
+        raise ActionError(action)
 
-    return {'action': action, 'options': options}
+    # Validate input options for the specified action.
+    if action == 'click' or action == 'submit':
+        if options:
+            raise OptionError("The action '%s' must not contain any arguments whereas supplied arguments: '%s'.", (action, repr(options)))
+
+    return {'selector': selector, 'action': action, 'options': options}
 
 def _parse_login(username, password, submit=""):
     """" Parses a command into action and options.
@@ -51,8 +82,6 @@ def _parse_login(username, password, submit=""):
          username (string):  the username.
          password (string): password.
          submit (bool): True if login form is to be submitted, false otherwise.
-
-    runhandler should be "_login_handler"
     """
     submit_bool = True if submit == "submit" else False
     args = {'username': username, 'password': password, 'submit': submit_bool}
