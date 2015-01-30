@@ -23,19 +23,41 @@ def _parse_focus(arg_str):
         return {'id': split_str[0], 'annotation': split_str[1]}
 
 def _parse_command(command):
-    # Return a dictionary with
-    #   action: the action type (if it's recognized)
-    #   options: a list of options
-    raise NotImplementedError()
+    """" Parses a command into action and options.
+
+    Returns a dictionary with following keys:
+       action (string): the action type (if it's recognized)
+       options (list): a list of options
+
+       Both keys have empty values if action type is not recognized.
+    """
+    # Initalize action and opttions with empty values.
+    action = ''
+    options = []
+
+    command_args = command.split(' ')
+    if command_args[0] in ('click', 'send_keys', 'submit'):
+        action = command_args[0]
+        options = command_args[-1]
+
+    return {'action': action, 'options': options}
 
 def _parse_login(username, password, submit=""):
-    # username and password are just strings, but cast submit to a bool
-    # runhandler should be "_login_handler"
-    raise NotImplementedError()
+    """" Parses a command into action and options.
+
+    Returns a dictionary with following keys:
+       username (string):  the username.
+       password (string): password.
+       submit (bool): True if login form is to be submitted, false otherwise.
+
+    runhandler should be "_login_handler"
+    """
+    submit_bool = True if submit is "submit" else False
+    return {'username': username, 'password': password, 'submit': submit_bool}
 
 def _parse_nav_steps(arg_str):
     """ Here's how to specify the navigation steps:
-        
+
         1. selector action [options] ["|" selector action [options]] ...
         2. aliased_action_sequence [options]
 
@@ -52,10 +74,10 @@ def _parse_nav_steps(arg_str):
             and specifying the action using the same syntax.
 
         aliased_action_sequence is one of a reserved keyword which aliases a common
-            sequence of actions as above (or performs special actions unavailable by 
+            sequence of actions as above (or performs special actions unavailable by
             the regular syntax) potentially with options. Available aliases:
 
-            LOGIN username password [submit], which just navigates to the login page 
+            LOGIN username password [submit], which just navigates to the login page
                 and inputs the given username and password. Submits the form is submit
                 is present, otherwise not.
 
@@ -138,14 +160,14 @@ class Screenshot(Image):
 
         if 'focus' in self.options:
             return_nodes.append(nodes.Text("DOM id is '%s' and annotation is '%s'.  " % (self.options['focus']['id'], self.options['focus']['annotation'])))
-        
+
         if 'user-role' in self.options:
             # Assign something to an instance variable so it can be used in other methods...
             pass
         else:
             # ...and have a default user
             pass
-        
+
         if 'url' in self.options:
             # Assign something to an instance variable so it can be used in other methods
             pass
