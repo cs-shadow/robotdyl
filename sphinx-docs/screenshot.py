@@ -52,7 +52,7 @@ def _parse_login(username, password, submit=""):
 
     runhandler should be "_login_handler"
     """
-    submit_bool = True if submit is "submit" else False
+    submit_bool = True if submit == "submit" else False
     return {'username': username, 'password': password, 'submit': submit_bool}
 
 def _parse_nav_steps(arg_str):
