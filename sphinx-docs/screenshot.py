@@ -46,14 +46,17 @@ def _parse_login(username, password, submit=""):
     """" Parses a command into action and options.
 
     Returns a dictionary with following keys:
-       username (string):  the username.
-       password (string): password.
-       submit (bool): True if login form is to be submitted, false otherwise.
+       runhandler (string):  "_login_handler".
+       args (dict) : A dictionary of arguments with following keys:
+         username (string):  the username.
+         password (string): password.
+         submit (bool): True if login form is to be submitted, false otherwise.
 
     runhandler should be "_login_handler"
     """
     submit_bool = True if submit == "submit" else False
-    return {'username': username, 'password': password, 'submit': submit_bool}
+    args = {'username': username, 'password': password, 'submit': submit_bool}
+    return {'runhandler': '_login_handler', 'args': args}
 
 def _parse_nav_steps(arg_str):
     """ Here's how to specify the navigation steps:
