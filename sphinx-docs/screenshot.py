@@ -57,8 +57,7 @@ def _parse_command(command):
 
     Raises an error if action type is not recognized or if options are invalid.
     """
-    # Replace multiple spaces by one.
-    command_args = " ".join(command.split())
+    command_args = command.split()
     selector = command_args[0]
     action = command_args[1]
     options = command_args[-1]
