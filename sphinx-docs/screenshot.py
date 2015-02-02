@@ -49,7 +49,7 @@ def _parse_command(command):
     # Validate input options for the specified action.
     if action == 'click' or action == 'submit':
         if options:
-            raise OptionError("The action '%s' must not contain any arguments whereas supplied arguments: '%s'.", (action, repr(options)))
+            raise OptionError("The action '%s' must not contain any arguments whereas supplied arguments: '%s'." % (action, repr(options)))
 
     return {'selector': selector, 'action': action, 'options': options}
 
