@@ -5,6 +5,7 @@ import docutils.parsers.rst.directives as directives
 
 import os
 import uuid
+import json
 
 from exceptions import NotImplementedError
 from errors import ActionError
@@ -151,11 +152,12 @@ class Screenshot(Image):
         from_str_arg["inputs"].append({"<slug>":filename})
         # This assignment is necessary because of the format the screenshots management command expects
         from_str_arg = [from_str_arg]
+        output_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),"_build","html","_images"))
         # Trying to import django.core.management.call_command gets you into some sort of import hell
         # Apparently due to a circular import, according to Ben Bach.
-        cmd_str = SCREENSHOT_COMMAND + " -v 0 --from-str '%s' --output-dir %s" % (json.dumps(from_str_arg), os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
+        cmd_str = SCREENSHOT_COMMAND + " --no-del -v 0 --from-str '%s' --output-dir %s" % (json.dumps(from_str_arg), output_path)
         os.system(cmd_str)
-        self.arguments.append(filename + ".png")
+        self.arguments.append(os.path.join("_images", filename+".png"))
         (image_node,) = Image.run(self)
         return image_node
 
@@ -206,7 +208,7 @@ class Screenshot(Image):
 
         if 'url' in self.options and 'navigation-steps' in self.options:
             runhandler = self.options['navigation-steps']['runhandler']
-            args = self.options['navigation-steps']['runhandler']
-            return_nodes.append(getattr(self, runhandler)(self, *args))
+            args = self.options['navigation-steps']['args']
+            return_nodes.append(getattr(self, runhandler)(**args))
 
         return return_nodes
