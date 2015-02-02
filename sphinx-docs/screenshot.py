@@ -41,7 +41,7 @@ def _parse_command(command):
     command_args = command.split()
     selector = command_args[0]
     action = command_args[1]
-    options = command_args[-1]
+    options = command_args[2:]
 
     if action not in ('click', 'send_keys', 'submit'):
         raise ActionError(action)
