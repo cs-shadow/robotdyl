@@ -12,20 +12,16 @@ I just want to give an example here of how documentation can be organized. Be su
 .. _toctree directive: http://sphinx-doc.org/markup/toctree.html
 
 .. screenshot::
-   :url: /a/test/url
+   :url: /another/test/url
+   :focus: just_the_id
+   :user-role: admin
+   :navigation-steps: LOGIN admin admin
 
 .. screenshot::
    :url: /another/test/url
    :focus: just_the_id
    :user-role: admin
-
-.. screenshot:: joy_web_logo.png
-   :url: /another/test/url/2
-   :focus: the_id and the annotation
-   :alt: alt text here
-   :class: is_this_a_list of css_classes
-   :user-role: admin
-   :navigation-steps: ['click #css-selector', 'submit #css-selector-form']
+   :navigation-steps: LOGIN admin admin submit
 
 Contents:
 

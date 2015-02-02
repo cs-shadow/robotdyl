@@ -3,11 +3,14 @@ from docutils.parsers.rst.directives.images import Image
 from docutils.parsers.rst import Directive
 import docutils.parsers.rst.directives as directives
 
-import re
+import os
+import uuid
 
 from exceptions import NotImplementedError
 from errors import ActionError
 from errors import OptionError
+
+SCREENSHOT_COMMAND = "python ../kalite/manage.py screenshots"
 
 def setup(app):
     app.add_directive('screenshot', Screenshot)
@@ -133,7 +136,28 @@ class Screenshot(Image):
     # to generate the screenshot (once the script is ready).#
     #########################################################
     def _login_handler(self, username, password, submit):
-        raise NotImplementedError()
+        from_str_arg = { "users": ["guest"],
+                         "slug": "",
+                         "start_url": "/securesync/login",
+                         "inputs": [{"#id_username":username},
+                                    {"#id_password":password},
+                                   ],
+                         "pages": [],
+                         "notes": [],
+                       }
+        if submit:
+            from_str_arg["inputs"].append({"<submit>":""})
+        filename = uuid.uuid4().__str__()
+        from_str_arg["inputs"].append({"<slug>":filename})
+        # This assignment is necessary because of the format the screenshots management command expects
+        from_str_arg = [from_str_arg]
+        # Trying to import django.core.management.call_command gets you into some sort of import hell
+        # Apparently due to a circular import, according to Ben Bach.
+        cmd_str = SCREENSHOT_COMMAND + " -v 0 --from-str '%s' --output-dir %s" % (json.dumps(from_str_arg), os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
+        os.system(cmd_str)
+        self.arguments.append(filename + ".png")
+        (image_node,) = Image.run(self)
+        return image_node
 
     def _command_handler(self, action, *options):
         raise NotImplementedError()
