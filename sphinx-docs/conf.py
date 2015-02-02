@@ -112,7 +112,12 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+
+  #Make the sidebar "fixed" so that it doesn't scroll out of view
+  'stickysidebar': True,
+  'nosidebar': False
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -152,7 +157,11 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+  '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html']
+}
+
+
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -269,3 +278,4 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+

@@ -56,3 +56,6 @@ target/
 
 # vim swap files, added by Mike Gallaspy
 *.swp
+
+# Ignore some mac fs file(?)
+*.DS_Store
