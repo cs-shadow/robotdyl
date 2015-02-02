@@ -6,6 +6,8 @@ import docutils.parsers.rst.directives as directives
 import re
 
 from exceptions import NotImplementedError
+from errors import ActionError
+from errors import OptionError
 
 def setup(app):
     app.add_directive('screenshot', Screenshot)
@@ -23,19 +25,47 @@ def _parse_focus(arg_str):
         return {'id': split_str[0], 'annotation': split_str[1]}
 
 def _parse_command(command):
-    # Return a dictionary with
-    #   action: the action type (if it's recognized)
-    #   options: a list of options
-    raise NotImplementedError()
+    """" Parses a command into action and options.
+
+    Returns a dictionary with following keys:
+       selector (string): the selector to identify the element
+       action (string): the action type (if it's recognized)
+       options (list): a list of options
+
+    Raises an error if action type is not recognized or if options are invalid.
+    """
+    command_args = command.split()
+    selector = command_args[0]
+    action = command_args[1]
+    options = command_args[-1]
+
+    if action not in ('click', 'send_keys', 'submit'):
+        raise ActionError(action)
+
+    # Validate input options for the specified action.
+    if action == 'click' or action == 'submit':
+        if options:
+            raise OptionError("The action '%s' must not contain any arguments whereas supplied arguments: '%s'.", (action, repr(options)))
+
+    return {'selector': selector, 'action': action, 'options': options}
 
 def _parse_login(username, password, submit=""):
-    # username and password are just strings, but cast submit to a bool
-    # runhandler should be "_login_handler"
-    raise NotImplementedError()
+    """" Parses a command into action and options.
+
+    Returns a dictionary with following keys:
+       runhandler (string):  "_login_handler".
+       args (dict) : A dictionary of arguments with following keys:
+         username (string):  the username.
+         password (string): password.
+         submit (bool): True if login form is to be submitted, false otherwise.
+    """
+    submit_bool = True if submit == "submit" else False
+    args = {'username': username, 'password': password, 'submit': submit_bool}
+    return {'runhandler': '_login_handler', 'args': args}
 
 def _parse_nav_steps(arg_str):
     """ Here's how to specify the navigation steps:
-        
+
         1. selector action [options] ["|" selector action [options]] ...
         2. aliased_action_sequence [options]
 
@@ -52,10 +82,10 @@ def _parse_nav_steps(arg_str):
             and specifying the action using the same syntax.
 
         aliased_action_sequence is one of a reserved keyword which aliases a common
-            sequence of actions as above (or performs special actions unavailable by 
+            sequence of actions as above (or performs special actions unavailable by
             the regular syntax) potentially with options. Available aliases:
 
-            LOGIN username password [submit], which just navigates to the login page 
+            LOGIN username password [submit], which just navigates to the login page
                 and inputs the given username and password. Submits the form is submit
                 is present, otherwise not.
 
@@ -138,14 +168,14 @@ class Screenshot(Image):
 
         if 'focus' in self.options:
             return_nodes.append(nodes.Text("DOM id is '%s' and annotation is '%s'.  " % (self.options['focus']['id'], self.options['focus']['annotation'])))
-        
+
         if 'user-role' in self.options:
             # Assign something to an instance variable so it can be used in other methods...
             pass
         else:
             # ...and have a default user
             pass
-        
+
         if 'url' in self.options:
             # Assign something to an instance variable so it can be used in other methods
             pass
